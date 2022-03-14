@@ -43,12 +43,12 @@ def main(in_csv_code="", add_mode=""):
         AdditionalOptionEnum.getAdditionalOptionEnumByValue(str(add_mode))
 
     # Serviceインスタンス
-    db_service = DbService(in_csv_enum.value["table"]["name"])
+    db_service = DbService()
     file_service = FileService()
 
     # テーブルクリア
     if add_mode_enum == AdditionalOptionEnum.TRUNCATE:
-        db_service.truncate_table()
+        db_service.truncate_table(in_csv_enum.value["table"]["name"])
 
     # import済ファイルの移動/格納ディレクトリを作成（無いときのみ）
     os.makedirs(in_csv_enum.value["input"]["dir"] + "/done", exist_ok=True)
@@ -74,6 +74,7 @@ def main(in_csv_code="", add_mode=""):
             if add_mode_enum == AdditionalOptionEnum.RECREATE and \
                not has_re_created:
                 db_service.recreate_table(
+                    in_csv_enum.value["table"]["name"],
                     file_column_cnt,
                     file_header_list,
                     in_csv_enum.value["table"]["column_prefix"]
@@ -82,6 +83,7 @@ def main(in_csv_code="", add_mode=""):
 
             # ファイルインポート
             total_insert_count += db_service.insert_list(
+                in_csv_enum.value["table"]["name"],
                 file_list,
                 file_column_cnt
             )
